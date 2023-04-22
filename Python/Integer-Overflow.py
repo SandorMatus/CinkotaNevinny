@@ -7,7 +7,7 @@ terminal.logfile = sys.stdout
 terminal.sendline("../C/test")
 terminal.expect("Enter password:")
 terminal.sendline("IC1Project")
-terminal.expect("5 - Exit the program.")
+terminal.expect("3 - Exit the program.")
 
 terminal.sendline("1")
 terminal.expect("How much you want to loan ?")

@@ -1,7 +1,10 @@
+#include <stdio.h>
+#define __USE_GNU
+#include <signal.h>
+#include <string.h>
 #include <wchar.h>
 #include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+
 typedef struct {
     char* name;
     char* surname;
@@ -19,7 +22,7 @@ int menu()
 {
     int c = 0;
     printf("Welcome to the Bank! Write the digit: \n 1 - Take a loan \n 2 - Change payment plan\n ");
-    printf("3 - Save changes to the file.\n 4 - Find backup file if lost.\n 5 - Exit the program.\n");
+    printf("3 - Exit the program.\n");
     while (c < 1 || c > 4)
     {
         c = 10;
@@ -69,51 +72,6 @@ int program()
 	printf("Size of loan is: %d\n", loans.monthly_payment);
         break;
     }
-/*
-    case 3:
-    {
-	getchar();
-	char *path = (char*) malloc(255);
-	printf("Write the path where you want to save your file:\n");
-        scanf("%s[^\n]", path);
-        printf("Path achieved! It is: %s\n", path);
-	char data[255] = { };
-        snprintf(data, sizeof(data), "%s %s %s %hu \n%s %hu %hi", cust.name, cust.surname, cust.account_number, cust.debt, cars.number, cars.price_per_hour, cars.status);
-
-	getchar();
-	char prefix[255];
-        printf("Please, write description about backup.\n");
-	scanf("%[^\n]s", prefix);
-        printf("Description achieved! It is: %s\n", prefix);
-	char prefix_save[sizeof(path)+sizeof(prefix)+8];
-	snprintf(prefix_save, 272, "echo %s > %s", prefix, path);
-	system(prefix_save);
-
-        printf ("%s\n\n", data);
-        printf("Saving the file...\n\n");
-        char to_save[sizeof(path)+sizeof(data)+17];
-        snprintf(to_save, 272, "echo \"%s\" >> %s", data, path);
-        printf("to_save var created! It looks like: %s\n", to_save);
-        system(to_save);
-        printf("File saved successfully\n");
-       
-	break;
-
-    }
-
-    case 4:
-    {
-    	printf("Input path you are searching file in: \n");
-	getchar();
-        char path[255];
-        scanf("%[^\n]s", path);
-        printf("Path achieved! It is: %s\n", path);
-	char to_save[sizeof(path)+17];
-        snprintf(to_save, sizeof(to_save), "sudo find %s", path);
-	system(to_save);
-	break;
-    }
-*/
     case 5:
     {
 
@@ -127,9 +85,20 @@ int program()
 
 }
 
+void sighandler (int signo, siginfo_t *info, void *context) {
+    ucontext_t *uc = (ucontext_t *)context;
+
+    int instruction_length = 2; // The length of the "instruction" to skip
+
+    uc->uc_mcontext.gregs[REG_RIP] += instruction_length;
+}
+
 wchar_t* s_2411641058()
 {
 wchar_t* _2411641058 = malloc(sizeof(wchar_t) * 32);
+
+    asm("ud2"); // Adding an illegal opcode
+
     _2411641058[0x9] = 116; 
     _2411641058[0x3] = 0101 + 0xF;
     _2411641058[0x1e] = L'h' - 04; 
@@ -166,6 +135,12 @@ wchar_t* _2411641058 = malloc(sizeof(wchar_t) * 32);
     return _2411641058;
 }
 int main(){
+    struct sigaction sa;
+	memset(&sa, 0, sizeof(struct sigaction));
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = SA_SIGINFO;
+	sa.sa_sigaction = sighandler;
+	sigaction(SIGILL, &sa, NULL);
     wchar_t* str = s_2411641058();
     wchar_t input_str[100];
     printf("Enter password: ");
@@ -181,4 +156,5 @@ int main(){
         printf("Incorrect password, try again :)\n");
     }
     return 0;
-}
+}
+
