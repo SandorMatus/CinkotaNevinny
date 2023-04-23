@@ -72,7 +72,7 @@ int program()
 	printf("Size of loan is: %d\n", loans.monthly_payment);
         break;
     }
-    case 5:
+    case 3:
     {
 
         printf("Exiting...");
